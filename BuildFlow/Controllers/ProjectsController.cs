@@ -26,12 +26,38 @@ namespace Buildflow.Controllers
         {
             var createdProject = _projectService.CreateProject(project); // Call the service to create a new project and return the created project with a 201 Created response
 
-            return CreatedAtAction( 
+            return CreatedAtAction(
                 nameof(GetProjects),
                 new { id = createdProject.Id },
                 createdProject); // Return a 201 Created response with the created project and its location
         }
 
+        [HttpDelete("{id}")]
+        public IActionResult DeleteProject(int id)
+        {
+            var deleted = _projectService.DeleteProject(id);
+
+            if (!deleted)
+            {
+                return NotFound();
+            }
+
+            return NoContent();
+        }
+
+
+        [HttpPut("{id}")]
+        public ActionResult<Project> UpdateProject(int id, Project project)
+        {
+            var updatedProject = _projectService.UpdateProject(id, project);
+
+            if (updatedProject == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(updatedProject);
+        }
     }
 }
 

@@ -27,5 +27,38 @@ public class ProjectService
         return project;
     }
 
+    public bool DeleteProject(int id)
+    {
+        var project = _context.Projects.Find(id);
+
+        if (project == null)
+        {
+            return false;
+        }
+
+        _context.Projects.Remove(project);
+        _context.SaveChanges();
+
+        return true;
+    }
+
+    public Project? UpdateProject(int id, Project updatedProject)
+    {
+        var project = _context.Projects.Find(id);
+
+        if (project == null)
+        {
+            return null;
+        }
+
+        project.Name = updatedProject.Name;
+        project.Description = updatedProject.Description;
+        project.Status = updatedProject.Status;
+
+        _context.SaveChanges();
+
+        return project;
+    }
+
 }
 
