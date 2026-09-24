@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Buildflow.Services;
+﻿using Buildflow.DTOs;
 using Buildflow.Models;
+using Buildflow.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Buildflow.Controllers
 {
@@ -15,16 +16,32 @@ namespace Buildflow.Controllers
         }
 
         [HttpGet]
-        public List<Project> GetProjects()
+        public async Task<ActionResult<List<ProjectDto>>> GetProjects()
         {
 
-            return _projectService.GetProjects(); // Call the service to get the list of projects and return it
+            var projects = await _projectService.GetProjectsAsync();
+            var projectDtos = projects.Select(project => new ProjectDto
+            {
+                Id = project.Id,
+                Name = project.Name,
+                Description = project.Description,
+                Status = project.Status
+            }).ToList();
+
+            return Ok(projectDtos);
+
         }
 
         [HttpPost]
-        public ActionResult<Project> CreateProject(Project project)
+        public async Task<ActionResult<Project>> CreateProjectAsync(CreateProjectDto project)
         {
-            var createdProject = _projectService.CreateProject(project); // Call the service to create a new project and return the created project with a 201 Created response
+            var newProject = new Project
+            {
+                Name = project.Name,
+                Description = project.Description,
+                Status = project.Status
+            };
+            var createdProject = await _projectService.CreateProjectAsync(newProject); // Call the service to create a new project and return the created project with a 201 Created response
 
             return CreatedAtAction(
                 nameof(GetProjects),
@@ -33,9 +50,9 @@ namespace Buildflow.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteProject(int id)
+        public async Task<IActionResult> DeleteProjectAsync(int id)
         {
-            var deleted = _projectService.DeleteProject(id);
+            var deleted = await _projectService.DeleteProjectAsync(id);
 
             if (!deleted)
             {
@@ -47,9 +64,16 @@ namespace Buildflow.Controllers
 
 
         [HttpPut("{id}")]
-        public ActionResult<Project> UpdateProject(int id, Project project)
+        public async Task <ActionResult<Project>> UpdateProjectAsync(int id, UpdateProjectDto project)
         {
-            var updatedProject = _projectService.UpdateProject(id, project);
+            var projectToUpdate = new Project
+            {
+                Name = project.Name,
+                Description = project.Description,
+                Status = project.Status
+            };
+
+            var updatedProject = await _projectService.UpdateProjectAsync(id, projectToUpdate);
 
             if (updatedProject == null)
             {
@@ -58,6 +82,8 @@ namespace Buildflow.Controllers
 
             return Ok(updatedProject);
         }
+
+
     }
 }
 

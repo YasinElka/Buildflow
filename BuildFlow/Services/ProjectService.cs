@@ -11,25 +11,22 @@ public class ProjectService
     {
         _context = context; // Assign the provided database context to the private field
     }
-    public List<Project> GetProjects() // This method returns a list of projects
+    public async Task<List<Project>> GetProjectsAsync()
     {
-
-
-        return _context.Projects.ToList();
-
+        return await _context.Projects.ToListAsync();
     }
 
-    public Project CreateProject(Project project)
+    public async Task<Project> CreateProjectAsync(Project project)
     {
         _context.Projects.Add(project); // Add the provided project to the Projects DbSet
-        _context.SaveChanges(); // Save the changes to the database
+        await _context.SaveChangesAsync(); // Save the changes to the database
 
         return project;
     }
 
-    public bool DeleteProject(int id)
+    public async Task<bool> DeleteProjectAsync(int id)
     {
-        var project = _context.Projects.Find(id);
+        var project = await _context.Projects.FindAsync(id);
 
         if (project == null)
         {
@@ -37,14 +34,14 @@ public class ProjectService
         }
 
         _context.Projects.Remove(project);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
         return true;
     }
 
-    public Project? UpdateProject(int id, Project updatedProject)
+    public async Task <Project?> UpdateProjectAsync(int id, Project updatedProject)
     {
-        var project = _context.Projects.Find(id);
+        var project = await _context.Projects.FindAsync(id);
 
         if (project == null)
         {
@@ -55,7 +52,7 @@ public class ProjectService
         project.Description = updatedProject.Description;
         project.Status = updatedProject.Status;
 
-        _context.SaveChanges();
+       await _context.SaveChangesAsync();
 
         return project;
     }
